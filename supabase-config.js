@@ -1,4 +1,2 @@
-// Điền URL và anon key của dự án Supabase để đồng bộ câu trả lời giữa các thiết bị.
-// Nếu để trống, website dùng chế độ lưu cục bộ trên trình duyệt.
-window.SUPABASE_URL = "";
-window.SUPABASE_ANON_KEY = "";
+// Supabase Project URL + anon public key. Never use service_role key.
+window.SUPABASE_URL="";window.SUPABASE_ANON_KEY="";

@@ -1,0 +1,17 @@
+const QUESTIONS = [
+{q:"Ấn tượng của em về anh là gì?",a:["Khá thú vị và dễ nói chuyện","Hài hước, vui tính","Trầm tính, hơi khó đoán","Vẫn đang tìm hiểu thêm"]},
+{q:"Có khi nào em mong chờ tin nhắn từ một người nào đó không?",a:["Có, khá thường xuyên","Thỉnh thoảng thôi","Có nhưng không muốn nói ra","Không để ý chuyện đó lắm"]},
+{q:"Em nghĩ anh là người dễ đoán hay khó hiểu?",a:["Dễ đoán, khá thẳng thắn","Khó hiểu một chút","Lúc dễ đoán, lúc khó hiểu","Chưa đủ dữ liệu để kết luận 😄"]},
+{q:"Nếu có người muốn tìm hiểu em nghiêm túc, em mong người đó thể hiện như thế nào?",a:["Chủ động và rõ ràng","Quan tâm bằng những hành động nhỏ","Kiên nhẫn, không tạo áp lực","Chân thành và nhất quán"]},
+{q:"Em có thích một người chủ động quan tâm mình không?",a:["Rất thích","Thích, nhưng vừa đủ thôi","Tùy vào người đó","Em thích cả hai cùng chủ động"]},
+{q:"Nếu anh rủ em đi cà phê riêng, em sẽ chọn địa điểm nào?",a:["Quán yên tĩnh, có nhạc nhẹ","Quán có view đẹp để chụp ảnh","Quán cà phê nhỏ, ấm cúng","Một nơi mới lạ, thú vị"]},
+{q:"Em nghĩ hai đứa mình có điểm gì giống nhau nhất?",a:["Cách nói chuyện và suy nghĩ","Sở thích, gu âm nhạc","Tính cách và cách nhìn cuộc sống","Chưa biết, cần thêm thời gian"]},
+{q:"Em có cảm thấy nói chuyện với anh khá thoải mái không?",a:["Có, rất thoải mái","Khá thoải mái","Đôi lúc vẫn hơi ngại","Vẫn đang làm quen thêm"]},
+{q:"Nếu được đặt một biệt danh cho anh, em sẽ đặt là gì?",a:["Ông cụ non","Anh hàng xóm","Hoàng tử hay cười","Một biệt danh do em tự nghĩ ra"]}
+];
+const $=id=>document.getElementById(id);let current=0;const answers={};
+function render(){const q=QUESTIONS[current];$("counter").textContent=String(current+1).padStart(2,"0")+" / 09";$("questionNumber").textContent="CÂU HỎI "+String(current+1).padStart(2,"0");$("questionText").textContent=q.q;$("progressBar").style.width=((current+1)/QUESTIONS.length*100)+"%";$("answers").innerHTML="";q.a.forEach((a,i)=>{const b=document.createElement("button");b.className="answer"+(answers[current]===a?" selected":"");b.innerHTML='<span class="letter">'+String.fromCharCode(65+i)+'</span><span></span>';b.querySelector("span:last-child").textContent=a;b.onclick=()=>{answers[current]=a;render()};$("answers").appendChild(b)});$("backBtn").style.visibility=current===0?"hidden":"visible";$("nextBtn").textContent=current===8?"Gửi câu trả lời ♡":"Tiếp theo →";$("nextBtn").disabled=!answers[current]}
+$("startBtn").onclick=()=>{$("welcome").classList.add("hidden");$("quiz").classList.remove("hidden");render()};
+$("backBtn").onclick=()=>{if(current>0){current--;render()}};
+$("nextBtn").onclick=async()=>{if(!answers[current])return;if(current<8){current++;render();return}const submission={answers:QUESTIONS.map((q,i)=>({question:q.q,answer:answers[i]})),submitted_at:new Date().toISOString()};try{if(window.supabaseClient){const {error}=await window.supabaseClient.from("linh_responses").insert({answers:submission.answers,submitted_at:submission.submitted_at});if(error)throw error}else{const old=JSON.parse(localStorage.getItem("linh_responses")||"[]");old.push(submission);localStorage.setItem("linh_responses",JSON.stringify(old))}$("quiz").classList.add("hidden");$("finish").classList.remove("hidden")}catch(e){alert("Chưa gửi được câu trả lời. Em thử lại giúp anh nhé!");console.error(e)}};
+if(window.SUPABASE_URL&&window.SUPABASE_ANON_KEY&&window.supabase){window.supabaseClient=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY)}
